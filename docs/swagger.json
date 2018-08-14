@@ -1,0 +1,87 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "MoonActive TT API",
+    "description": "Echo API",
+    "version": "1.0.0"
+  },
+  "schemes": [
+    "http"
+  ],
+  "basePath": "/v1.0",
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/echoAtTime": {
+      "x-swagger-router-controller": "echo",
+      "post": {
+        "operationId": "echoAtTime",
+        "summary": "schedule a message to print",
+        "description": "Endpoint scheduling a message.",
+        "tags": [
+          "Echo"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "echoData",
+            "description": "JSON data of the message.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/echoData"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "message added into the queue"
+          },
+          "500": {
+            "description": "error response",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "errorResponse": {
+      "type": "object",
+      "properties": {
+        "errorCode": {
+          "type": "string",
+          "description": "The error code"
+        },
+        "message": {
+          "type": "string",
+          "description": "The error description"
+        },
+        "reportId": {
+          "type": "string",
+          "description": "Id of report"
+        }
+      }
+    },
+    "echoData": {
+      "type": "object",
+      "required": [
+        "message",
+        "datetime"
+      ],
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "datetime": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
