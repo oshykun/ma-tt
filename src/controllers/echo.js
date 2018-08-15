@@ -4,17 +4,17 @@ exports.echoAtTime = async function(req, res, next) {
 		const diManager   = req.app.moonactive.diManager;
 		const messageData = req.swagger.params.echoData.value;
 
-		let logger = diManager.getValue('logger');
+		const logger = diManager.getValue('logger');
 		logger.info(messageData.message);
 		logger.info(messageData.datetime);
 
-		let messageService = diManager.getValue('messageService');
-		await messageService.pushMessage(messageData);
-		const message = await messageService.getMessage(messageData.datetime);
+		const messageService = diManager.getValue('messageService');
+		await messageService.scheduleMessageToPrint(messageData);
+		// const { m1, m2 }     = await messageService.scheduleMessageToPrint(messageData);
+		// console.log(m1);
+		// console.log(m2);
 
-		logger.info(message);
-
-		res.status(200).send(message);
+		res.status(204).end();
 	} catch (err) {
 		error = err;
 	} finally {

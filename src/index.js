@@ -31,6 +31,9 @@ class App {
 		this._logger.debug(`${this.constructor.name} - start`);
 		await loadMiddlewares.call(this);
 
+		const messageService = this._diManager.getValue('messageService');
+		await messageService.initMessagesHandler();
+
 		this._server = await new Promise(resolve => {
 			let server = this._app.listen(this._config.serverConfig.apiPort, () => resolve(server));
 		});
