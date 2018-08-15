@@ -1,6 +1,6 @@
 const { loggerConfig, ...config } = require('./config');
 const Logger                      = require('./logger');
-const App                         = require('./src');
+const App                         = require('./src/app');
 
 const logger = new Logger(loggerConfig);
 const app    = new App(logger, config);

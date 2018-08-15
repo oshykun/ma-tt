@@ -79,7 +79,8 @@
           "type": "string"
         },
         "datetime": {
-          "type": "string"
+          "type": "string",
+          "description": "string representation of date UTC, e.g. 2018-08-15T08:06:27Z"
         }
       }
     }

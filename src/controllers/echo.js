@@ -5,15 +5,12 @@ exports.echoAtTime = async function(req, res, next) {
 		const messageData = req.swagger.params.echoData.value;
 
 		const logger = diManager.getValue('logger');
-		logger.info(messageData.message);
-		logger.info(messageData.datetime);
+		logger.debug(`Received message data: ${JSON.stringify(messageData)}`);
 
 		const messageService = diManager.getValue('messageService');
 		await messageService.scheduleMessageToPrint(messageData);
-		// const { m1, m2 }     = await messageService.scheduleMessageToPrint(messageData);
-		// console.log(m1);
-		// console.log(m2);
 
+		logger.debug(`Message data: ${JSON.stringify(messageData)}}, successfully scheduled.`);
 		res.status(204).end();
 	} catch (err) {
 		error = err;

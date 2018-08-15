@@ -7,7 +7,7 @@ class MessageService {
 		this._QUEUE_PREFIX     = 'queue_';
 		this._QUEUE_KEY        = 'QUEUE_KEY';
 		this._KEY_PATTERN      = /^queue_(.*)/;
-		this._logger.debug(`${MessageService.name} - constructor`);
+		this._logger.debug(`${this.constructor.name} - constructor`);
 	}
 
 	async pushMessage(messageData) {
@@ -20,34 +20,30 @@ class MessageService {
 		return this._repositoryFacade.messages.getMessageByKey(messageKey);
 	}
 
-	async scheduleMessageToPrint({ message, datetime }) {
+	async scheduleMessageToPrint(messageData) {
 		this._logger.debug(`${this.constructor.name} - scheduleMessageToPrint`);
-		const messageId = uuidv4();
-		const key       = `${this._QUEUE_PREFIX}${messageId}`;
-		const val       = '';
-		const exUnits   = 'PX';
-		const exVal     = new Date(datetime).getTime() - Date.now();
+		const { datetime } = messageData;
+		const messageId    = uuidv4();
+		const key          = `${this._QUEUE_PREFIX}${messageId}`;
+		const val          = '';
+		const exUnits      = 'PX';
+		const exVal        = new Date(datetime).getTime() - Date.now();
 		try {
 			await this._repositoryFacade.messages.setMessageWithExpiration(key, val, exUnits, exVal);
-			await this._repositoryFacade.messages.addMessageIntoQueue(this._QUEUE_KEY, messageId, JSON.stringify(message));
-			// TODO: remove it:
-			// const m1 = await this._repositoryFacade.messages.getMessageFromQueue(this._QUEUE_KEY, messageId);
-			// const m2 = await this._repositoryFacade.messages.getMessageByKey(key);
-			// return { m1, m2 };
+			await this._repositoryFacade.messages.addMessageIntoQueue(this._QUEUE_KEY, messageId, JSON.stringify(messageData));
 		} catch (err) {
 			this._logger.error(err);
 		}
 	}
 
-	// TODO: think of moving it into separate class...
+	// TODO: think of moving it into separate class:
+	// maybe create different folder with auto loading and automatically init listeners
 	async initMessagesHandler() {
 		this._logger.debug(`${this.constructor.name} - initMessagesHandler`);
 		const messageListener = this._repositoryFacade.messages.getMessageListener();
 
-		messageListener.on('message', async (channel, message) => {
-			await messageHandler.call(this, message);
-		});
-
+		messageListener.on('message', (channel, message) => messageHandler.call(this, message));
+		// subscribe on expired events
 		messageListener.subscribe('__keyevent@0__:expired');
 
 		// handle already expired scheduled messages
@@ -64,11 +60,14 @@ async function messageHandler(message) {
 	try {
 		const messageData = await this._repositoryFacade.messages.getMessageFromQueue(this._QUEUE_KEY, messageId);
 		if (messageData) {
-			// removing message which needs to be printed
+			const { message, datetime } = JSON.parse(messageData);
+			if (new Date(datetime).getTime() >= Date.now()) {
+				return;
+			}
+			// cleanup message which needs to be printed
 			const deleteRes = await this._repositoryFacade.messages.delMessageFromQueue(this._QUEUE_KEY, messageId);
 			if (deleteRes) {
-				// TODO: check if need to use JSON.parse
-				this._logger.info(`MESSAGE: ${messageData}`);
+				this._logger.info(`MESSAGE: ${message}`);
 			}
 		}
 	} catch (err) {

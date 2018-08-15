@@ -49,7 +49,7 @@ class App {
 }
 
 async function loadMiddlewares() {
-	this._logger.debug(`${App.name} - loadMiddlewares`);
+	this._logger.debug(`${this.constructor.name} - loadMiddlewares`);
 	let swaggerMiddleware = await new Promise(resolve => swaggerTools.initializeMiddleware(this._swaggerDoc, resolve));
 	let filesLoader       = this._diManager.getValue('filesLoader');
 	let middlewares       = filesLoader.loadFilesSync(`${__dirname}/middlewares`, [], true);
@@ -57,7 +57,7 @@ async function loadMiddlewares() {
 }
 
 function addConfigsIntoDI(config) {
-	this._logger.debug(`${App.name} - addConfigsIntoDI`);
+	this._logger.debug(`${this.constructor.name} - addConfigsIntoDI`);
 	return Object.entries(config)
 				 .forEach(([configKey, configValue]) => {
 					 mapDependency.call(this, configValue, { name: configKey, type: 'value' });
