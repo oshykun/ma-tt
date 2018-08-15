@@ -49,8 +49,8 @@ To schedule a message you should sent an http **POST** request to /echoAtTime, p
 Body example:
 ```JSON
 {
-	"message": "Really important message to be printed",
-	"datetime": "2018-08-15T08:17:05Z"
+  "message": "Really important message to be printed",
+  "datetime": "2018-08-15T08:17:05Z"
 }
 ```
 
