@@ -32,6 +32,16 @@ class MessagesDomain extends BaseDomain {
 		return this._redisConnectorWrapper.getFromHash(hashKey, messageId);
 	}
 
+	async getAllExpiredMessagesFromQueue(hashKey) {
+		this._logger.debug(`${this.constructor.name} - getAllExpiredMessagesFromQueue`);
+		return this._redisConnectorWrapper.getAllKeysByHash(hashKey);
+	}
+
+	async delMessageFromQueue(hashKey, messageId) {
+		this._logger.debug(`${this.constructor.name} - addMessageIntoQueue`);
+		return this._redisConnectorWrapper.removeFromHash(hashKey, messageId);
+	}
+
 	getMessageListener() {
 		this._logger.debug(`${this.constructor.name} - getMessageListener`);
 		return this._redisConnectorWrapper.messageListener;
